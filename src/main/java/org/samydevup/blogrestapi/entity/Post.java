@@ -2,23 +2,30 @@ package org.samydevup.blogrestapi.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+import java.util.HashSet;
+import java.util.Set;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 
-@Table(name = "posts",uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
+@Table(name = "posts", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
 @Entity
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "title",nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "description",nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
-    @Column(name = "content",nullable = false)
+    @Column(name = "content", nullable = false)
     private String content;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
 }
