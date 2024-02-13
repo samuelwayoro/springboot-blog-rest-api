@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(long postId, CommentDto commentDto) {
         /**
          * 1-convertir l'objet dto en entité ,
-         * 2-recuperé le post pour lequel on voudrais créer un commentaire
+         * 2-recuperé le post pour lequel on voudrais créer un commentaire pour le setté au nouveau commentaire
          * 3-et finir par intégrer le nouveau commentaire en base .
          */
         Comment comment = mapToEntity(commentDto);
