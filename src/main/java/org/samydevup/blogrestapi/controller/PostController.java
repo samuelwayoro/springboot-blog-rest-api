@@ -1,5 +1,6 @@
 package org.samydevup.blogrestapi.controller;
 
+import jakarta.validation.Valid;
 import org.samydevup.blogrestapi.payload.PostDto;
 import org.samydevup.blogrestapi.payload.PostResponse;
 import org.samydevup.blogrestapi.service.PostService;
@@ -19,7 +20,7 @@ public class PostController {
 
     //create a blog
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         /**
          PostDto postDto1 = postService.createPost(postDto);
          return  new ResponseEntity<>(postDto1, HttpStatus.CREATED);
@@ -45,7 +46,7 @@ public class PostController {
 
     //update a post by id
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> updatePost(@RequestBody PostDto postDto, @PathVariable("id") Long id) {
+    public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable("id") Long id) {
         PostDto updatedPostDtoResponse = postService.updatePost(postDto, id);
         return new ResponseEntity<>(updatedPostDtoResponse, HttpStatus.OK);
     }
