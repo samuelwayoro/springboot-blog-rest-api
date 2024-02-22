@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) ->
                         //authorize.anyRequest().authenticated()) //-->commenté car demande un authentification user sur ts les endpoints
                         authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()//permet un accès total sur toutes les méthodes de type GET émises sur l'url commençant par /api/
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()//demande une authentification sur toutes les autres url des endpoints
                 ).httpBasic(Customizer.withDefaults());
         return http.build();
@@ -68,8 +69,9 @@ public class SecurityConfig {
 
 
     /***
-     * Méthode permettant de generer dans le context spring
-     * un AUTHENTICATION MANAGER : qui servira a authentifier via spring security les utilisateurs
+     * Méthode permettant de generer dans le context spring (mise a disposition dans le context Spring pour être injectable dans toutes
+     * les autres classes du projet)
+     * un AUTHENTICATION MANAGER : qui servira a authentifier via spring security les utilisateurs de nos endpoints
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
