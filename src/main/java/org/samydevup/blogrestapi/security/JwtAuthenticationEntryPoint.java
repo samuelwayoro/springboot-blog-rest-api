@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/***
+ * classe permettant de lancer une exception lorsque un user qui n'a pas les droits voudra
+ * acceder à une API .
+ */
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
