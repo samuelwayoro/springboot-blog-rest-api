@@ -18,32 +18,29 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * * CETTE CLASSE SERT A CONFIGURER L'AUTHENTIFICATION EN MEMOIRE DE SPRING SECURITY
+ * * * CETTE CLASSE SERT A CONFIGURER L'AUTHENTIFICATION EN MEMOIRE OU EN BASE DE DONNEES DE SPRING SECURITY
  *
- * @Configuration : annotation au niveau de la classe indiquant
+ * @Configuration : Annotation au niveau de la classe indiquant
  * qu'il s'agit d'une classe de définitions de bean(à partir de méthode annotée @Bean).
  *
- * @EnableMethodSecurity : annotation au niveau de la classe indiquant l'activation des annotation springSecurity :
+ * @EnableMethodSecurity : Annotation au niveau de la classe indiquant l'activation des annotation SpringSecurity :
  * @PreAuthorize , @PostAuthorize , @Prefilter , @PostFilter
  *
  */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-
     private UserDetailsService userDetailsService;
-
     public SecurityConfig(UserDetailsService userDetailsService){
         this.userDetailsService = userDetailsService;
     }
-
     @Bean
     public static PasswordEncoder passwordEncoder() { //methode permettant l'encodage des password de user
         return new BCryptPasswordEncoder();
     }
 
     /**
-     * Méthode securityFilterChain permet de mettre a disposition
+     * Méthode securityFilterChain permettant de mettre a disposition
      * un filtre en tant que bean dans le security context servant a activer une authentification
      * obligatoire de tous les users de nos endpoints .
      *
@@ -57,9 +54,9 @@ public class SecurityConfig {
          * Activation de la basic authentification
          * sur les endPoints de nos controllers
          */
-        http.csrf((csrf) -> csrf.disable())
+        http.csrf((csrf) -> csrf.disable())//securise contre les attaques de type csrf
                 .authorizeHttpRequests((authorize) ->
-                        //authorize.anyRequest().authenticated()) //-->commenté car demande un authentification user sur ts les endpoints
+                        //authorize.anyRequest().authenticated()) //-->commenté car demande une authentification user sur ts les endpoints
                         authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()//permet un accès total sur toutes les méthodes de type GET émises sur l'url commençant par /api/
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()//demande une authentification sur toutes les autres url des endpoints
@@ -69,9 +66,8 @@ public class SecurityConfig {
 
 
     /***
-     * Méthode permettant de generer dans le context spring (mise a disposition dans le context Spring pour être injectable dans toutes
-     * les autres classes du projet)
-     * un AUTHENTICATION MANAGER : qui servira a authentifier via spring security les utilisateurs de nos endpoints
+     * Méthode permettant de génerer dans le context spring (pour être injectable dans toutes les autres classes du projet)
+     * un objet de type AuthenticationManager : qui servira a authentifier via spring security les utilisateurs de nos endpoints
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
