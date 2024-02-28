@@ -1,5 +1,6 @@
 package org.samydevup.blogrestapi.controller;
 
+import org.samydevup.blogrestapi.payload.JWTAuthResponse;
 import org.samydevup.blogrestapi.payload.LoginDto;
 import org.samydevup.blogrestapi.payload.RegisterDto;
 import org.samydevup.blogrestapi.service.AuthService;
@@ -28,11 +29,17 @@ public class AuthenticationController {
      * @return
      */
     @PostMapping(value = {"/login", "/signin"})//-->méthode accessible a la fois à : /api/auth/login et /api/auth/signin
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
-        String response = authService.Login(loginDto);
+    public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDto loginDto) {
+        //le service de connexion renvoie a present un token jwt : nous renommons response en token
+        //String response = authService.Login(loginDto);
+        String token = authService.Login(loginDto);
+
+        //on retourne a present un dto JWTAuthResponse
+        JWTAuthResponse jwtAuthResponse = new JWTAuthResponse();
+        jwtAuthResponse.setAccessToken(token);
 
         //---> pareille que return new ResponseEntity<>(response, HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(jwtAuthResponse);
     }
 
     /**

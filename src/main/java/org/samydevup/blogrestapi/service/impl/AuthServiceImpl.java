@@ -7,6 +7,7 @@ import org.samydevup.blogrestapi.payload.LoginDto;
 import org.samydevup.blogrestapi.payload.RegisterDto;
 import org.samydevup.blogrestapi.repository.RoleRepository;
 import org.samydevup.blogrestapi.repository.UserRepository;
+import org.samydevup.blogrestapi.security.JwtTokenProvider;
 import org.samydevup.blogrestapi.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,15 +27,18 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     /***
@@ -44,12 +48,23 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public String Login(LoginDto loginDto) {
-        //authentification de l'utilisateur demandant a se connecter a partir de la proprieté : AuthenticationManger
+        /**
+         * Authentification de l'utilisateur demandant a se
+         * connecter a partir de la proprieté : AuthenticationManager
+         * nb : si l'authentification est ok on save le user dans le spring context
+         *      sinon une exception interne a Authentication est lancée
+         */
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(), loginDto.getPassword()));
-        //si authentification du user ok : sauvegarde de l'utilisateur dans le spring security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //on retourne pour finir un String message de connexion ok
-        return "User connecté!!";
+        String token = jwtTokenProvider.generateToken(authentication);
+        /***
+         * on retourne pour finir
+         * un String message de connexion ok
+         *  return "User connecté!!";
+         */
+
+        //on retourne a présent le token utilisateur en lieu et place d'une chaine de caractere
+        return token;
     }
 
     @Override
