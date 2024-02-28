@@ -17,14 +17,15 @@ import java.security.Key;
 import java.util.Date;
 
 /***
- * classe utilitaire servant à :
- *  1-GENERER LE TOKEN POUR LES USER : generateToken() ( à partir des app.jwt infos dans le fichier application.properties)
- *  2-OBTENIR LE USERNAME DANS LE TOKEN DES REQUETTES CLIENTES : getUsername()
- *  3-VALIDER LE TOKEN JWT ENVOYEE DANS LES REQUETTES CLIENTE : validateToken()
+ * classe utilitaire mettant a disposition les methodes utilitaires suivantes :
+ *  1- generateToken() ( à partir des app.jwt credentials dans le fichier application.properties) ->GENERER LE TOKEN POUR LES USER
+ *  2- getUsername() : OBTENIR LE USERNAME DANS LE TOKEN DES REQUETTES CLIENTES
+ *  3- validateToken() : VALIDER LE TOKEN JWT ENVOYE DANS LES REQUETTES CLIENTE
+ *
+ *  NB : CETTE CLASSE EST UTILISEE PAR LE FILTRE JwtAuthenticationFilter pour le filtre de toutes les requêtes entrantes
  */
 @Component
 public class JwtTokenProvider {
-
     @Value("${app.jwt-secret}")
     private String jwtSecret;
     @Value("${app.jwt-expiration-milliseconds}")
@@ -52,10 +53,9 @@ public class JwtTokenProvider {
         return token;
     }
 
-    /***
-     * Création de l'objet key
-     * pour la génération du jwt token
-     */
+    /*** méthode utilitaire permettant de décoder
+     *** la clé sécrète utilisée dans le jwt
+     ***/
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
@@ -94,7 +94,7 @@ public class JwtTokenProvider {
         } catch (UnsupportedJwtException unsupportedJwtException) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Unsupported JWT token");
         } catch (IllegalArgumentException illegalArgumentException) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Jwt claims is empty");
+            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Jwt claims string is null or empty");
         }
     }
 
