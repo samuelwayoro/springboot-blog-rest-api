@@ -16,15 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /***
- * FILTRE PERMETTANT D'EXECUTER LA METHODE doFilterInternal()
+ * FILTRE PERMETTANT D'EXECUTER
+ * LA METHODE doFilterInternal()
  * à chaque requête cliente entrante
- */
+ ***/
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private JwtTokenProvider jwtTokenProvider;
     private UserDetailsService userDetailsService;
-
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService customUserDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = customUserDetailsService;
@@ -32,7 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /***
      * METHODE PERMETTANT
-     * LA VERIFICATION DU TOKEN DE LA REQUETTE ENTRANTE
+     * LA VERIFICATION DU TOKEN
+     * DE TOUTES REQUETTES ENTRANTE
+     *
+     *
      * @param request
      * @param response
      * @param filterChain
@@ -49,10 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //validation du token : d'adbord verifie si il non null ou vide ensuite valide le token avec jwtTokenProvider.validate()
         if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)){
 
-            //recup le username dans le token
+            //recup le username dans le token à partir de la méthode getUsername de la classe jwtTokenProvider
             String username = jwtTokenProvider.getUsername(token);
 
-            //charger le user associé au token
+            //charger le user associé au token à partir de la méthode loadUserByUsernmane() de la classe UserDetailsService
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             //créons un objet de type : UsernamePasswordAuthenticationToken depuis spring security authentication
@@ -74,8 +76,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
+    /***
+     * Méthode utilitaire permettant de recuperer
+     * le token contenu dans le header d'une requette http entrante
+     *
+     * @param request
+     * @return
+     */
     private String getTokenFromRequest(HttpServletRequest request){
-        //recup de le contenu de l'autorisation dans le header de la requette
+        //recup du contenu de l'autorisation dans le header de la requette
         String bearerToken = request.getHeader("Authorization");
 
         //verifie si ce contenu n'est pas vide (avec la classe utilitaire de SpringFramework StringUtils.hasText()
