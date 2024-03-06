@@ -73,6 +73,8 @@ public class SecurityConfig {
                         //authorize.anyRequest().authenticated()) //-->commenté car demande une authentification user sur ts les endpoints
                         authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()//permet un accès total sur toutes les méthodes de type GET émises sur l'url commençant par /api/
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()//demande une authentification sur toutes les autres url des endpoints
                 ).exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
