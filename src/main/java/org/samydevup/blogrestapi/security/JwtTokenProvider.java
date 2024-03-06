@@ -53,9 +53,10 @@ public class JwtTokenProvider {
         return token;
     }
 
-    /*** méthode utilitaire permettant de décoder
-     *** la clé sécrète utilisée dans le jwt
-     ***/
+    /** méthode utilitaire permettant de décoder
+     * la clé sécrète utilisée dans le jwt
+     * cette méthode est utilisée dans la méthode generateToken()
+     */
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }

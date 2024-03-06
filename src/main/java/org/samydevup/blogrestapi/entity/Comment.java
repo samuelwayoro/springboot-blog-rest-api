@@ -17,7 +17,7 @@ public class Comment {
     private String name;
     private String email;
     private String body;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//afin de charger son post immédiatement à la demande du client
     @JoinColumn(name = "post_id",nullable = false)
     private Post post;
 

@@ -2,33 +2,33 @@
 
 1-Ajouter les dépendances maven de jwt dans le projet : jjwt-impl / jjwt-api / jjwt-jackson
 
-2-Créer une classe JwtAuthenticationEntryPoint (dans le package security): qui vas permettre de lever les exceptions lors des tentatives
-  d'accès des users non autorisés . En fait cette classe vas devoir implémenter l'interface AuthenticationEntryPoint
-  du package org.springframework.security.web; afin d'implémenter sa méthode commence(HttpServletRequest req,HttpServletResponse res,AuthenticationException authException).
+2-Créer une classe JwtAuthenticationEntryPoint (dans le package security): qui vas filtrer et lever des exceptions lors des tentatives
+  d'accès des users non autorisés .
+  En fait cette classe vas devoir implémenter l'interface AuthenticationEntryPoint du package org.springframework.security.web;
+  afin d'implémenter sa méthode : public void commence(HttpServletRequest req,HttpServletResponse res,AuthenticationException authException).
   Cette méthode sera appelée chaque fois qu'une exception due a une tentative d'accès d'un utilisateur non autorisé à une ressource.
 
 3-Ajouter les propriétés Jwt dans les fichiers de propriétés (application.properties). Ces propriétés sont :
     - app.jwt-secret : une chaîne de caractère qui represente la clé secrète que le serveur utilise pour échanger avec le client
-       Elle doit être doit être encodée en sha256 ou en autre algo avant d'être renseigné dans ce fichier.
+       Elle doit être encodée en sha256 ou en autre algo avant d'être renseigné dans ce fichier.
     - app.jwt-expiration-milliseconds : qui es la durée de vie du token de l'utilisateur. Il est exprimé en millisecondes , alors
     il serait important de passer par un utilitaire (exemple : convertisseur google de jours en millisecondes)
 
-4-Créer la class JwtTokenProvider annotée @Component dans le package security .
+4-Créer la class JwtTokenProvider annotée : @Component dans le package security afin d'en faire un Bean Spring.
     Cette classe met à dispositions des méthodes utilitaires liées (méthode de traitements) du Jwt. Pour le faire elle contient :
     1-deux propriétés privées :
     - jwtSecret qui contient la valeur de la clé sécrète (encodée) et renseignée dans le fichier application.properties
     - jwtExpirationDate contenant aussi la durée de vie du Token en milliseconde renseignée aussi dans le même fichier.
     2-une première méthode generateToken() : comme son nom l'indique permet de génerer le token à partir de l'objet authentication
-    3-une méthode getUsername() : permettant de retourner le username d'une requêtte client à partir de son token
-    4-une méthode validateToken() : permettant de valider un token envoyé par un requête client . Attention cette méthode lance des
-    exception en fonction de l'erreur liée au token
-
+    3-une méthode getUsername() : permettant de retourner le username d'une requêtte client extrait de son token jwt
+    4-une méthode validateToken() : permettant de valider un token envoyé par une requête client . Attention cette méthode lance des
+    exception en fonction de l'erreur liée au token .
 
 5-Creér le filtre JwtAuthenticationFilter(dans le package security) qui est responsable de l'authentification de l'utilisateur
  à partir de son token. Ce filtre contient deux propriétes : JwtTokenProvider et UserDetailsService utilisé dans la méthode doFilterIntenal()
- du filtre pour effectuer le traitement suivant sur le token :
+ pour effectuer le traitement suivant sur le token :
      1- recup le token de la requêtte entrante après traitement à l'aide d'une méthode privée : getTokenFromRequest()
-     2- valider le token : verifier si il non null ou vide ensuite valider le token avec la méthode validate() de la prop jwtTokenProvider
+     2- valider le token : verifier si il es non null ou vide ensuite valider le token avec la méthode validate() de la prop jwtTokenProvider
      3- recup le username dans le token à partir de la méthode getUsername de la prop jwtTokenProvider
      4- charger le user associé au token à partir de la méthode loadUserByUsernmane() de la classe UserDetailsService
      5- créer un objet de type : UsernamePasswordAuthenticationToken depuis spring security authentication
@@ -43,11 +43,20 @@
     securityFilterChain (NB : la méthode securityFilterChain() sert à mettre a disposition un Bean de configuration des accès aux
     endPoints de nos service Web .)
 
-7-Effectuer la configuration de JWT dans Spring Security : configuration de la classe SecurityConfig
-    Cette configuration sert a ajouter comme propriété un objet de type authenticationEntryPoint dans la classe SecurityConfig.
-    Cette prop sera utilisée dans la méthode securityFilterChain() afin d'ajouter le filtre d'authentification : authenticationFilter avant
-    le UsernamePasswordAuthenticationFilter.class à partir de l'objet http.addFilterBefore(). Ceci est très utile afin d'interdir
-    l'accès aux endpoints au users non permis .
+7-Effectuer la configuration de JWT dans Spring Security : configuration de la classe SecurityConfig.class
+    crééer si celà n'est pas encore fait la classe SecurityConfig dans un package : config
+    Il s'agit de la classe principale qui gère la sécurité dans une application springboot avec jwt.
+    Cette configuration sert à lui ajouter comme propriété un objet de type JwtAuthenticationEntryPoint ,
+    en plus d'une autre propriété : JwtAuthenticationFilter authenticationFilter.
+    Ces deux propriétées seront utilisée dans la méthode annotée @Bean : securityFilterChain() qui sert à :
+    - sécuriser les endpoints contre les attaques de type csrf
+    - configurer les accès a nos endpoints en prenant le soin de lever des exceptions en fonctions des cas :
+        .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint) : exceptions liées au jwt
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) : exceptions liées à la session utilisateur
+
+    la prop JwtAuthenticationEntryPoint sera une seconde fois utilisée dans la méthode securityFilterChain() afin d'ajouter
+    le filtre d'authentification : authenticationFilter avant le UsernamePasswordAuthenticationFilter.class à partir de l'objet http.addFilterBefore().
+    Ceci est très utile afin de filtrer toutes les requettes entrantes et d'interdir l'accès aux endpoints au users non permis .
 
 
 8- coder la méthode de connexion utilisateur (Login/Signin) dans le controller d'authentification afin de retourner maintenant un JWT Token
