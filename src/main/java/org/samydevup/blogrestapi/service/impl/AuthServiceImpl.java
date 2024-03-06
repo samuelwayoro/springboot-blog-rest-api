@@ -70,15 +70,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String register(RegisterDto registerDto) {
         //verifier si le user existe deja en base de données : soit par son username ou son email
-
         if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Username déjà utilisé");
         }
-
         if (userRepository.existsByEmail(registerDto.getEmail())) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Email déjà utilisé");
         }
-
         //sinon on l'ajoute (inscrit) en base de données
         User user = new User();
         user.setUsername(registerDto.getUsername());
@@ -89,11 +86,8 @@ public class AuthServiceImpl implements AuthService {
         Set<Role> roles = new HashSet<>();
         Role role = roleRepository.findByName("ROLE_USER").get();
         roles.add(role);
-
         user.setRoles(roles);
-
         userRepository.save(user);
-
         return "Utilisateur bien inscrit!!";
     }
 }

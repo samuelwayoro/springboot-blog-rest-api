@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -30,7 +31,7 @@ public class PostServiceImpl implements PostService {
 
     private Logger log = LoggerFactory.getLogger(PostServiceImpl.class);
 
-    public PostServiceImpl(PostRepository postRepository,ModelMapper modelMapper,CategoryRepository categoryRepository) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
         this.modelMapper = modelMapper;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
@@ -39,12 +40,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto createPost(PostDto postDto) {
         //recup de la categorie du post
-        Category postCategory = categoryRepository.findById(postDto.getCategoryId()).orElseThrow(()->new ResourceNotFoundException("Category","id", postDto.getCategoryId()));
+        Category postCategory = categoryRepository.findById(postDto.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
         //convert postDto to post entity
         Post post = mapToEntity(postDto);
         //ajouter la categorie retournée au post
         post.setCategory(postCategory);
-        log.info("post a save en base {} ",post.toString());
+        log.info("post a save en base {} ", post.toString());
         //integration en base de donnees
         Post newPost = postRepository.save(post);
         //convert newPost to a PostDto for the PostDto method return object
@@ -92,9 +93,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto updatePost(PostDto postDto, Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", id));
+        Category category = categoryRepository.findById(postDto.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Categorie", "id", postDto.getCategoryId()));
         post.setTitle(postDto.getTitle());
         post.setDescription(postDto.getDescription());
         post.setContent(postDto.getContent());
+        post.setCategory(category);
         Post updatedPost = postRepository.save(post);
         return mapToDto(updatedPost);
     }
@@ -105,6 +108,16 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(post);
     }
 
+    @Override
+    public List<PostDto> getPostsByCategory(Long categoryId) {
+        //verifier d'abord si la catégorie existe dans la bd
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()->new ResourceNotFoundException("Categorie","id",categoryId));
+        //recuperer la liste des postes de cette categorie
+        List<Post> posts = postRepository.findByCategoryId(categoryId);
+        //convertir cette liste de posts en liste de payload postsDto (a partir d'une lambda expression Map)
+        return posts.stream().map(post -> modelMapper.map(post,PostDto.class)).collect(Collectors.toList());
+    }
+
     /**
      * convertion d'entité en dto
      *
@@ -112,7 +125,7 @@ public class PostServiceImpl implements PostService {
      * @return
      */
     private PostDto mapToDto(Post post) {
-        PostDto postDto = modelMapper.map(post,PostDto.class);
+        PostDto postDto = modelMapper.map(post, PostDto.class);
         /*
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
@@ -129,7 +142,7 @@ public class PostServiceImpl implements PostService {
      * @return
      */
     private Post mapToEntity(PostDto postDto) {
-        Post post = modelMapper.map(postDto,Post.class);
+        Post post = modelMapper.map(postDto, Post.class);
         /*
         Post post = new Post();
         post.setTitle(postDto.getTitle());
