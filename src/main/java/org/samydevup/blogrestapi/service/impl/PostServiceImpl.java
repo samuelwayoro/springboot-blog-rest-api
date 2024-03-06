@@ -1,12 +1,16 @@
 package org.samydevup.blogrestapi.service.impl;
 
 import org.modelmapper.ModelMapper;
+import org.samydevup.blogrestapi.entity.Category;
 import org.samydevup.blogrestapi.entity.Post;
 import org.samydevup.blogrestapi.exception.ResourceNotFoundException;
 import org.samydevup.blogrestapi.payload.PostDto;
 import org.samydevup.blogrestapi.payload.PostResponse;
+import org.samydevup.blogrestapi.repository.CategoryRepository;
 import org.samydevup.blogrestapi.repository.PostRepository;
 import org.samydevup.blogrestapi.service.PostService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,15 +26,25 @@ public class PostServiceImpl implements PostService {
 
     private ModelMapper modelMapper;
 
-    public PostServiceImpl(PostRepository postRepository,ModelMapper modelMapper) {
+    private CategoryRepository categoryRepository;
+
+    private Logger log = LoggerFactory.getLogger(PostServiceImpl.class);
+
+    public PostServiceImpl(PostRepository postRepository,ModelMapper modelMapper,CategoryRepository categoryRepository) {
         this.modelMapper = modelMapper;
         this.postRepository = postRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public PostDto createPost(PostDto postDto) {
+        //recup de la categorie du post
+        Category postCategory = categoryRepository.findById(postDto.getCategoryId()).orElseThrow(()->new ResourceNotFoundException("Category","id", postDto.getCategoryId()));
         //convert postDto to post entity
         Post post = mapToEntity(postDto);
+        //ajouter la categorie retournée au post
+        post.setCategory(postCategory);
+        log.info("post a save en base {} ",post.toString());
         //integration en base de donnees
         Post newPost = postRepository.save(post);
         //convert newPost to a PostDto for the PostDto method return object

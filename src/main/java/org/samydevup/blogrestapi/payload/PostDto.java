@@ -22,4 +22,6 @@ public class PostDto {
     @NotEmpty(message = "le contenu du post ne doit pas être vide")
     private String content;
     private Set<CommentDto> comments;
+
+    private Long categoryId;
 }
