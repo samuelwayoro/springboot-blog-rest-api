@@ -10,7 +10,6 @@ import org.samydevup.blogrestapi.payload.PostDtoV2;
 import org.samydevup.blogrestapi.payload.PostResponse;
 import org.samydevup.blogrestapi.service.PostService;
 import org.samydevup.blogrestapi.utils.AppConstants;
-import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,17 +71,18 @@ public class PostController {
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post By Id REST API is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
-    @GetMapping("/api/v1/posts/{id}")//a test via : http://localhost:8080/api/v1/posts/idPost
+    @GetMapping(value = "/api/posts/{id}", params = "version=1")
+//a test via : http://localhost:8080/api/posts/idPost?version=1
     public ResponseEntity<PostDto> getPostByIdV1(@PathVariable("id") Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post with tag's informations , by id rest api is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http status 200 success")
-    @GetMapping("/api/v2/posts/{id}")//a tester via : http://localhost:8080/api/v2/post/idPost
+    @GetMapping(value = "/api/posts/{id}", params = "version=2")
+//a tester via : http://localhost:8080/api/post/idPost?version=2
     public ResponseEntity<PostDtoV2> getPostByIdV2(@PathVariable("id") Long id) {
         PostDto postDto = postService.getPostById(id);
-        System.out.println(postDto.toString());
         PostDtoV2 postDtoV2 = new PostDtoV2();
         postDtoV2.setId(postDto.getId());
         postDtoV2.setTitle(postDto.getTitle());
@@ -93,7 +93,6 @@ public class PostController {
         tags.add("Spring Boot");
         tags.add("AWS");
         postDtoV2.setTags(tags);
-        System.out.println(postDtoV2.toString());
         return ResponseEntity.ok(postDtoV2);
     }
 
