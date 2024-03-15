@@ -71,18 +71,19 @@ public class PostController {
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post By Id REST API is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
-    @GetMapping(value = "/api/posts/{id}", headers = "X-API-VERSION=1")
+    @GetMapping(value = "/api/posts/{id}",produces = "application/vnd.blogsapi.v1+json")
 //a test via : http://localhost:8080/api/posts/idPost
-//NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE-VALEUR : key:X-API-VERSION / value:1 dans le header dans postman
+//NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE-VALEUR : Accept : application/vnd.blogsapi.v1+json dans le header dans postman
     public ResponseEntity<PostDto> getPostByIdV1(@PathVariable("id") Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+
     @Operation(summary = "Get Post by id REST API", description = "Get Post with tag's informations , by id rest api is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http status 200 success")
-    @GetMapping(value = "/api/posts/{id}", headers = "X-API-VERSION=2")
+    @GetMapping(value = "/api/posts/{id}",produces = "application/vnd.blogsapi.v2+json")
 //a tester via : http://localhost:8080/api/post/idPost
-// NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE-VALEUR : key:X-API-VERSION / value:2 dans le header dans postman
+// NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE VALEUR : Accept : application/vnd.blogsapi.v2+json dans le header dans postman
     public ResponseEntity<PostDtoV2> getPostByIdV2(@PathVariable("id") Long id) {
         PostDto postDto = postService.getPostById(id);
         PostDtoV2 postDtoV2 = new PostDtoV2();
