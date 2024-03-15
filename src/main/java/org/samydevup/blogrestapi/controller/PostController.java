@@ -72,14 +72,14 @@ public class PostController {
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post By Id REST API is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
-    @GetMapping("/api/v1/posts/{id}")
+    @GetMapping("/api/v1/posts/{id}")//a test via : http://localhost:8080/api/v1/posts/idPost
     public ResponseEntity<PostDto> getPostByIdV1(@PathVariable("id") Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post with tag's informations , by id rest api is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http status 200 success")
-    @GetMapping("/api/v2/posts/{id}")
+    @GetMapping("/api/v2/posts/{id}")//a tester via : http://localhost:8080/api/v2/post/idPost
     public ResponseEntity<PostDtoV2> getPostByIdV2(@PathVariable("id") Long id) {
         PostDto postDto = postService.getPostById(id);
         System.out.println(postDto.toString());
