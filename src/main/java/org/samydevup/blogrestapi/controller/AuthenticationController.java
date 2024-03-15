@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller , Endpoint exposant le service de connexion , deconnexion utilisateur a l'application
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthenticationController {
     private AuthService authService;
 

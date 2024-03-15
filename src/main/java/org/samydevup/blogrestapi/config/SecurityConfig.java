@@ -78,8 +78,8 @@ public class SecurityConfig {
         http.csrf((csrf) -> csrf.disable())//securise contre les attaques de type csrf
                 .authorizeHttpRequests((authorize) ->
                         //authorize.anyRequest().authenticated()) //-->commenté car demande une authentification user sur ts les endpoints
-                        authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()//permet un accès total sur toutes les méthodes de type GET émises sur l'url commençant par /api/
-                                .requestMatchers("/api/auth/**").permitAll().requestMatchers("/swagger-ui/**").permitAll().requestMatchers("/v3/api-docs/**").permitAll().anyRequest().authenticated()//demande une authentification sur toutes les autres url des endpoints
+                        authorize.requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()//permet un accès total sur toutes les méthodes de type GET émises sur l'url commençant par /api/
+                                .requestMatchers("/api/v1/auth/**").permitAll().requestMatchers("/swagger-ui/**").permitAll().requestMatchers("/v3/api-docs/**").permitAll().anyRequest().authenticated()//demande une authentification sur toutes les autres url des endpoints
                 ).exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         //rajouter le filtre d'authentification de jwt avant le filtre de springSecurity UsernamePasswordAuthenticationFilter

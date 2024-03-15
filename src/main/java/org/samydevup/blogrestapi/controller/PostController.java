@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.samydevup.blogrestapi.payload.PostDto;
-import org.samydevup.blogrestapi.payload.PostDtoV2;
 import org.samydevup.blogrestapi.payload.PostResponse;
 import org.samydevup.blogrestapi.service.PostService;
 import org.samydevup.blogrestapi.utils.AppConstants;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -71,34 +69,33 @@ public class PostController {
 
     @Operation(summary = "Get Post by id REST API", description = "Get Post By Id REST API is used to get single post from the database")
     @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
-    @GetMapping(value = "/api/posts/{id}",produces = "application/vnd.blogsapi.v1+json")
-//a test via : http://localhost:8080/api/posts/idPost
-//NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE-VALEUR : Accept : application/vnd.blogsapi.v1+json dans le header dans postman
+    @GetMapping(value = "/api/v1/posts/{id}")
     public ResponseEntity<PostDto> getPostByIdV1(@PathVariable("id") Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
 
-    @Operation(summary = "Get Post by id REST API", description = "Get Post with tag's informations , by id rest api is used to get single post from the database")
-    @ApiResponse(responseCode = "200", description = "Http status 200 success")
-    @GetMapping(value = "/api/posts/{id}",produces = "application/vnd.blogsapi.v2+json")
-//a tester via : http://localhost:8080/api/post/idPost
-// NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE VALEUR : Accept : application/vnd.blogsapi.v2+json dans le header dans postman
-    public ResponseEntity<PostDtoV2> getPostByIdV2(@PathVariable("id") Long id) {
-        PostDto postDto = postService.getPostById(id);
-        PostDtoV2 postDtoV2 = new PostDtoV2();
-        postDtoV2.setId(postDto.getId());
-        postDtoV2.setTitle(postDto.getTitle());
-        postDtoV2.setDescription(postDto.getDescription());
-        postDtoV2.setContent(postDto.getContent());
-        List<String> tags = new ArrayList<>();
-        tags.add("Java");
-        tags.add("Spring Boot");
-        tags.add("AWS");
-        postDtoV2.setTags(tags);
-        return ResponseEntity.ok(postDtoV2);
-    }
-
+    /*** METHODE UTILISEE POUR EXPLIQUER LE FONCTIONNEMENT DU VERSIONNING DES API
+     @Operation(summary = "Get Post by id REST API", description = "Get Post with tag's informations , by id rest api is used to get single post from the database")
+     @ApiResponse(responseCode = "200", description = "Http status 200 success")
+     @GetMapping(value = "/api/posts/{id}",produces = "application/vnd.blogsapi.v2+json")
+     //a tester via : http://localhost:8080/api/post/idPost
+     // NB : NE PAS OUBLIER D'AJOUTER LA PAIRE CLE VALEUR : Accept : application/vnd.blogsapi.v2+json dans le header dans postman
+     public ResponseEntity<PostDtoV2> getPostByIdV2(@PathVariable("id") Long id) {
+     PostDto postDto = postService.getPostById(id);
+     PostDtoV2 postDtoV2 = new PostDtoV2();
+     postDtoV2.setId(postDto.getId());
+     postDtoV2.setTitle(postDto.getTitle());
+     postDtoV2.setDescription(postDto.getDescription());
+     postDtoV2.setContent(postDto.getContent());
+     List<String> tags = new ArrayList<>();
+     tags.add("Java");
+     tags.add("Spring Boot");
+     tags.add("AWS");
+     postDtoV2.setTags(tags);
+     return ResponseEntity.ok(postDtoV2);
+     }
+     */
     @Operation(summary = "Update Post REST API", description = "Update Post REST API is used to update a particular post in the database")
     @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
     @SecurityRequirement(name = "Bear Authentication")
