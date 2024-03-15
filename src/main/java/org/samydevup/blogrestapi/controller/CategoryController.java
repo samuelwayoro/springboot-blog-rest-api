@@ -1,5 +1,6 @@
 package org.samydevup.blogrestapi.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.samydevup.blogrestapi.payload.CategoryDto;
 import org.samydevup.blogrestapi.service.CategoryService;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @SecurityRequirement(name = "Bear Authentication")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto){
@@ -35,6 +37,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
+    @SecurityRequirement(name = "Bear Authentication")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto,@PathVariable Long id){
@@ -42,6 +45,7 @@ public class CategoryController {
         return new ResponseEntity<>(updateCategory,HttpStatus.OK);
     }
 
+    @SecurityRequirement(name = "Bear Authentication")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id){
